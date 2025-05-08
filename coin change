@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <limits.h>
+
+#define MAX 1000  // Maximum change amount supported
+
+void minCoins(int coins[], int n, int change) {
+    int dp[MAX];
+    int lastUsed[MAX];
+
+    for (int i = 0; i <= change; i++) {
+        dp[i] = INT_MAX - 1;  // Prevent overflow
+        lastUsed[i] = -1;
+    }
+
+    dp[0] = 0;
+
+    // Fill dp[] table
+    for (int i = 1; i <= change; i++) {
+        for (int j = 0; j < n; j++) {
+            if (coins[j] <= i && dp[i - coins[j]] + 1 < dp[i]) {
+                dp[i] = dp[i - coins[j]] + 1;
+                lastUsed[i] = j;
+            }
+        }
+    }
+
+    if (dp[change] == INT_MAX - 1) {
+        printf("Change cannot be returned with the available coins.\n");
+        return;
+    }
+
+    printf("Minimum coins required: %d\n", dp[change]);
+    printf("Coins used: ");
+
+    int temp = change;
+    while (temp > 0) {
+        int coin = coins[lastUsed[temp]];
+        printf("%d ", coin);
+        temp -= coin;
+    }
+    printf("\n");
+}
+
+int main() {
+    int purchaseAmount, paidAmount;
+
+    printf("Enter purchase amount: ");
+    scanf("%d", &purchaseAmount);
+
+    printf("Enter amount paid by customer: ");
+    scanf("%d", &paidAmount);
+
+    if (paidAmount < purchaseAmount) {
+        printf("Insufficient amount paid.\n");
+        return 0;
+    }
+
+    int change = paidAmount - purchaseAmount;
+
+    int coins[] = {1, 2, 5, 10};  // Example coin denominations
+    int n = sizeof(coins) / sizeof(coins[0]);
+
+    printf("Change to be returned: %d\n", change);
+
+    minCoins(coins, n, change);
+
+    return 0;
+}
