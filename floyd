@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <limits.h>
+
+#define MAXN 100 // maximum number of warehouses
+#define INF 1000000000 // a large “infinite” value
+
+int dist[MAXN][MAXN];
+
+int main() {
+    int n, m;
+    printf("Enter number of warehouses (n): ");
+    scanf("%d", &n);
+    printf("Enter number of roads (m): ");
+    scanf("%d", &m);
+
+    // 1) Initialize distances
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (i == j) dist[i][j] = 0;
+            else dist[i][j] = INF;
+        }
+    }
+
+    // 2) Read the road network edges
+    // (undirected; if directed, just remove the symmetric assignment)
+    printf("Enter each road as: u v t (0-based indices, travel time t)\n");
+    for (int e = 0; e < m; e++) {
+        int u, v, t;
+        scanf("%d %d %d", &u, &v, &t);
+        if (t < dist[u][v]) {
+            dist[u][v] = t;
+            dist[v][u] = t;
+        }
+    }
+
+    // 3) Floyd–Warshall DP
+    for (int k = 0; k < n; k++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (dist[i][k] + dist[k][j] < dist[i][j]) {
+                    dist[i][j] = dist[i][k] + dist[k][j];
+                }
+            }
+        }
+    }
+
+    // 4) Print the all-pairs shortest-path matrix
+    printf("\nShortest travel times between all pairs of warehouses:\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (dist[i][j] >= INF/2) 
+                printf("INF ");
+            else
+                printf("%d ", dist[i][j]);
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
+// Enter number of warehouses (n): 4
+// Enter number of roads (m): 5
+// Enter each road as: u v t (0-based indices, travel time t)
+// 0 1 40
+// 0 2 30
+// 1 2 20
+// 1 3 50
+// 2 3 10
+
+// Shortest travel times between all pairs of warehouses:
+// 0 40 30 40 
+// 40 0 20 30 
+// 30 20 0 10 
