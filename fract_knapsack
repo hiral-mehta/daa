@@ -1,0 +1,77 @@
+#include <stdio.h>
+//knapsack using selection sort
+void selectionSort(float *ratios, int *profits, int *weights, int n) {
+    for (int i = 0; i < n - 1; i++) {
+        int max_idx = i;
+        for (int j = i + 1; j < n; j++) {
+            if (ratios[j] > ratios[max_idx]) {
+                max_idx = j;
+            }
+        }
+        // Swap ratio
+        float tempR = ratios[i];
+        ratios[i] = ratios[max_idx];
+        ratios[max_idx] = tempR;
+
+        // Swap profit
+        int tempP = profits[i];
+        profits[i] = profits[max_idx];
+        profits[max_idx] = tempP;
+
+        // Swap weight
+        int tempW = weights[i];
+        weights[i] = weights[max_idx];
+        weights[max_idx] = tempW;
+    }
+}
+
+float greedyKnapsack(int *profits, int *weights, float *ratios, int n, int capacity) {
+    // Sort all arrays based on ratio (descending)
+    selectionSort(ratios, profits, weights, n);
+
+    float totalProfit = 0.0;
+    int remaining = capacity;
+
+    for (int i = 0; i < n; i++) {
+        if (weights[i] <= remaining) {
+            totalProfit += profits[i];
+            remaining -= weights[i];
+        } else {
+            totalProfit += profits[i] * ((float)remaining / weights[i]);
+            break;
+        }
+    }
+    return totalProfit;
+}
+
+int main() {
+    int profits[] = {60, 100, 120, 80};
+    int weights[] = {10, 20, 30, 15};
+    int n = sizeof(profits) / sizeof(profits[0]);
+    
+     printf("Artifact : Profit Weight\n");
+    for(int i=0;i<n;i++){
+        printf("Artifact %d :%d %d ",i+1,profits[i],weights[i]);
+        printf("\n");
+    }
+
+    int capacity=50;
+    printf("\nThe capacity of Knapsack is: %d\n",capacity);
+    
+    float ratios[n];
+    for (int i = 0; i < n; i++) {
+        ratios[i] = (float)(profits[i] / weights[i]);
+    }
+
+    float maxProfit = greedyKnapsack(profits, weights, ratios, n, capacity);
+    
+    printf("\nSorted Artifacts (by profit/weight):\n");
+for (int i = 0; i < n; i++) {
+    printf("Artifact %d: Profit = %d, Weight = %d, Ratio = %.2f\n",
+           i + 1, profits[i], weights[i], ratios[i]);
+}
+    
+    printf("\nMaximum Profit: %.2f\n", maxProfit);
+
+    return 0;
+}
